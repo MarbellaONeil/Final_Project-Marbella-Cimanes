@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manga Cloud</title>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+    }
+
+    body {
+        background: #121212;
+        color: white;
+        overflow-x: hidden;
+    }
+
+    /* ANIMATED BACKGROUND */
+    body::before {
+        content: "";
+        position: fixed;
+        width: 200%;
+        height: 200%;
+        background:
+            radial-gradient(circle, #ff408144 10%, transparent 10%),
+            radial-gradient(circle, #00e5ff22 10%, transparent 10%);
+        background-size: 120px 120px;
+        animation: bgMove 20s linear infinite;
+        z-index: -1;
+    }
+
+    @keyframes bgMove {
+        from { transform: translate(0, 0); }
+        to { transform: translate(-120px, -120px); }
+    }
+
+    /* LOGIN */
+    #loginPage {
+        width: 100%;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .login-box {
+        width: 350px;
+        background: #1f1f1f;
+        padding: 35px;
+        border-radius: 20px;
+        text-align: center;
+        box-shadow: 0 0 20px #ff408177;
+        animation: floatBox 3s infinite ease-in-out;
+    }
+
+    @keyframes floatBox {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+        100% { transform: translateY(0px); }
+    }
+
+    .login-box h1 {
+        color: #ff4081;
+        margin-bottom: 20px;
+    }
+
+    .login-box input {
+        width: 100%;
+        padding: 12px;
+        margin: 10px 0;
+        border: none;
+        border-radius: 10px;
+        background: #2b2b2b;
+        color: white;
+    }
+
+    .login-box button {
+        width: 100%;
+        padding: 12px;
+        border: none;
+        border-radius: 10px;
+        background: #ff4081;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .login-box button:hover {
+        transform: scale(1.05);
+        background: #ff1f6d;
+    }
+
+    /* MAIN */
+    #mainWebsite {
+        display: none;
+    }
+
+    header {
+        background: #1f1f1f;
+        padding: 20px;
+        text-align: center;
+    }
+
+    header h1 {
+        color: #ff4081;
+    }
+
+    nav {
+        background: #292929;
+        padding: 15px;
+        display: flex;
+        justify-content: center;
+        gap: 25px;
+        flex-wrap: wrap;
+    }
+
+    nav a {
+        cursor: pointer;
+        transition: 0.3s;
+        font-weight: bold;
+    }
+
+    nav a:hover {
+        color: #ff4081;
+        transform: scale(1.1);
+    }
+
+    .section-title {
+        padding: 20px;
+        font-size: 25px;
+        color: #ff4081;
+    }
+
+    .content {
+        padding: 20px;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 20px;
+    }
+
+    /* CARD */
+    .anime-card {
+        background: #1f1f1f;
+        border-radius: 15px;
+        overflow: hidden;
+        transition: 0.4s;
+        animation: fadeUp 1s ease;
+    }
+
+    @keyframes fadeUp {
+        from {
+            opacity: 0;
+            transform: translateY(40px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .anime-card:hover {
+        transform: translateY(-10px) scale(1.03);
+        box-shadow: 0 0 20px #ff408166;
+    }
+
+    .anime-card img {
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+        cursor: pointer;
+    }
+
+    .anime-card h3 {
+        padding: 15px;
+        color: #ff4081;
+    }
+
+    .anime-card p {
+        padding: 0 15px 15px;
+        font-size: 14px;
+    }
+
+    .anime-card button {
+        margin: 10px;
+        padding: 10px;
+        border: none;
+        border-radius: 10px;
+        background: #ff4081;
+        color: white;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .anime-card button:hover {
+        background: #ff1f6d;
+    }
+
+    /* POPUP */
+    #watchPopup {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.95);
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        z-index: 1000;
+    }
+
+    #watchPopup iframe {
+        width: 80%;
+        height: 80%;
+        border: none;
+        border-radius: 15px;
+        animation: zoomIn 0.5s ease;
+        background: white;
+    }
+
+    @keyframes zoomIn {
+        from {
+            transform: scale(0.5);
+            opacity: 0;
+        }
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    #closeWatch {
+        margin-top: 15px;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 10px;
+        background: #ff4081;
+        color: white;
+        cursor: pointer;
+    }
+
+    /* MY LIST */
+    #myListSection {
+        display: none;
+        padding: 20px;
+    }
+
+    .list-item {
+        background: #1f1f1f;
+        padding: 15px;
+        margin-bottom: 10px;
+        border-radius: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .remove-btn {
+        background: red;
+        border: none;
+        color: white;
+        padding: 8px 12px;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+
+    footer {
+        text-align: center;
+        padding: 20px;
+    }
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div id="loginPage">
+    <div class="login-box">
+        <h1>Manga Cloud</h1>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="login()">LOGIN</button>
+    </div>
+</div>
+
+<!-- MAIN -->
+<div id="mainWebsite">
+
+    <header>
+        <h1>Manga Cloud</h1>
+        <p>Your Hub for Streaming Anime</p>
+    </header>
+
+    <nav>
+        <a onclick="showHome()">Home</a>
+        <a onclick="showPopular()">Popular</a>
+        <a onclick="showLibrary()">Library</a>
+        <a onclick="showMyList()">My List</a>
+        <a onclick="showAbout()">About Us</a>
+    </nav>
+
+    <h2 class="section-title" id="sectionTitle">Popular Anime</h2>
+
+    <!-- ANIME SECTION -->
+    <div class="content" id="animeContainer">
+
+        <!-- Attack on Titan -->
+        <div class="anime-card">
+            <img src="https://3.bp.blogspot.com/-sHQNlmGeVfI/U_KCw-TN8NI/AAAAAAABRe4/ODp0evThixM/s1600/AOT-07260_COMBO-front_large.jpg"
+            onclick="watchAnime('https://www.crunchyroll.com/series/GR751KNZY/attack-on-titan')">
+            <h3>Attack on Titan</h3>
+            <p>Humanity fights gigantic titans.</p>
+            <button onclick="addToList('Attack on Titan')">Add to My List</button>
+        </div>
+
+        <!-- Demon Slayer -->
+        <div class="anime-card">
+            <img src="https://upload.wikimedia.org/wikipedia/en/0/09/Demon_Slayer_-_Kimetsu_no_Yaiba%2C_volume_1.jpg"
+            onclick="watchAnime('https://www.crunchyroll.com/series/GY19NQ96Y/demon-slayer-kimetsu-no-yaiba')">
+            <h3>Demon Slayer</h3>
+            <p>Tanjiro becomes a demon slayer.</p>
+            <button onclick="addToList('Demon Slayer')">Add to My List</button>
+        </div>
+
+        <!-- One Piece -->
+        <div class="anime-card">
+            <img src="https://tse4.mm.bing.net/th/id/OIP.Pqt14Y4OoCExsMjb-ieAcQHaLs?rs=1&pid=ImgDetMain&o=7&rm=3"
+            onclick="watchAnime('https://www.crunchyroll.com/series/GRMG8ZQZR/one-piece')">
+            <h3>One Piece</h3>
+            <p>Pirates search for the ultimate treasure.</p>
+            <button onclick="addToList('One Piece')">Add to My List</button>
+        </div>
+
+        <!-- Naruto -->
+        <div class="anime-card">
+            <img src="https://th.bing.com/th/id/R.7f5c0bb5e591f05b203984986af16d7c?rik=wlgc6gNdOFqW4A&riu=http%3a%2f%2forig03.deviantart.net%2f5c17%2ff%2f2012%2f360%2ff%2fa%2fnaruto_manga_cover_63_by_chekoaguilar-d5pa3ym.jpg&ehk=Hd%2fwepTwl0e5Zbnivi%2bW5kNAqQccIYN8hTNH3YdF5j8%3d&risl=1&pid=ImgRaw&r=0"
+            onclick="watchAnime('https://www.crunchyroll.com/series/GY9PJ5KWR/naruto')">
+            <h3>Naruto</h3>
+            <p>A ninja dreams of becoming Hokage.</p>
+            <button onclick="addToList('Naruto')">Add to My List</button>
+        </div>
+
+        <!-- Jujutsu Kaisen -->
+        <div class="anime-card">
+            <img src="https://static1.srcdn.com/wordpress/wp-content/uploads/2023/09/jujutsu-kaisen-anime-poster.jpg"
+            onclick="watchAnime('https://www.crunchyroll.com/series/GRDV0019R/jujutsu-kaisen')">
+            <h3>Jujutsu Kaisen</h3>
+            <p>Sorcerers battle dangerous curses.</p>
+            <button onclick="addToList('Jujutsu Kaisen')">Add to My List</button>
+        </div>
+
+        <!-- Solo Leveling -->
+        <div class="anime-card">
+            <img src="https://th.bing.com/th/id/OIP.6aYRrMauAylAHa8SiELzTAHaLH?o=7rm=3&rs=1&pid=ImgDetMain&o=7&rm=3"
+            onclick="watchAnime('https://www.crunchyroll.com/series/GDKHZEJ0K/solo-leveling')">
+            <h3>Solo Leveling</h3>
+            <p>The weakest hunter becomes overpowered.</p>
+            <button onclick="addToList('Solo Leveling')">Add to My List</button>
+        </div>
+
+    </div>
+
+    <!-- MY LIST -->
+    <div id="myListSection"></div>
+
+    <!-- ABOUT -->
+    <div id="aboutSection" style="display:none; padding:20px;">
+        <div style="background:#1f1f1f; padding:20px; border-radius:15px; line-height:1.8;">
+            <p>Manga Cloud is an anime streaming website made for anime fans who want a simple and interactive experience.</p>
+
+            <br>
+
+            <p>Watch popular anime, build your own anime list, and explore different series in one place.</p>
+
+            <br>
+
+            <p>
+                <strong>Founders:</strong><br>
+                Rei O' Neil Marbella<br>
+                Rodjen Cimanes
+            </p>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2026 Manga Cloud. All Rights Reserved.</p>
+    </footer>
+
+</div>
+
+<!-- WATCH POPUP -->
+<div id="watchPopup">
+    <iframe id="animeFrame"></iframe>
+    <button id="closeWatch">Close Anime</button>
+</div>
+
+<script>
+
+    /* LOGIN */
+    function login() {
+        let user = document.getElementById("username").value;
+        let pass = document.getElementById("password").value;
+
+        if(user !== "" && pass !== "") {
+            document.getElementById("loginPage").style.display = "none";
+            document.getElementById("mainWebsite").style.display = "block";
+            document.getElementById("animeContainer").style.display = "grid";
+        } else {
+            alert("Please enter username and password!");
+        }
+    }
+
+    /* WATCH */
+    const popup = document.getElementById("watchPopup");
+    const frame = document.getElementById("animeFrame");
+
+    function watchAnime(link) {
+        popup.style.display = "flex";
+        frame.src = link;
+    }
+
+    document.getElementById("closeWatch").onclick = function () {
+        popup.style.display = "none";
+        frame.src = "";
+    };
+
+    /* MY LIST */
+    function addToList(anime) {
+
+        const listSection = document.getElementById("myListSection");
+
+        const existing = Array.from(listSection.children).find(item =>
+            item.textContent.includes(anime)
+        );
+
+        if(existing) {
+            alert(anime + " is already in My List!");
+            return;
+        }
+
+        const item = document.createElement("div");
+        item.className = "list-item";
+
+        item.innerHTML = `
+            <span>${anime}</span>
+            <button class="remove-btn">Remove</button>
+        `;
+
+        item.querySelector(".remove-btn").onclick = function () {
+            item.remove();
+        };
+
+        listSection.appendChild(item);
+
+        alert(anime + " added to My List!");
+    }
+
+    /* NAVIGATION */
+    function hideAll() {
+        document.getElementById("animeContainer").style.display = "none";
+        document.getElementById("myListSection").style.display = "none";
+        document.getElementById("aboutSection").style.display = "none";
+    }
+
+    function showHome() {
+        hideAll();
+        document.getElementById("sectionTitle").innerText = "Home";
+        document.getElementById("animeContainer").style.display = "grid";
+    }
+
+    function showPopular() {
+        hideAll();
+        document.getElementById("sectionTitle").innerText = "Popular Anime";
+        document.getElementById("animeContainer").style.display = "grid";
+    }
+
+    function showLibrary() {
+        hideAll();
+        document.getElementById("sectionTitle").innerText = "Anime Library";
+        document.getElementById("animeContainer").style.display = "grid";
+    }
+
+    function showMyList() {
+        hideAll();
+        document.getElementById("sectionTitle").innerText = "My List";
+        document.getElementById("myListSection").style.display = "block";
+    }
+
+    function showAbout() {
+        hideAll();
+        document.getElementById("sectionTitle").innerText = "About Us";
+        document.getElementById("aboutSection").style.display = "block";
+    }
+
+    /* ESC CLOSE */
+    document.addEventListener("keydown", function(e) {
+
+        if(e.key === "Escape" && popup.style.display === "flex") {
+            popup.style.display = "none";
+            frame.src = "";
+        }
+
+    });
+
+</script>
+
+</body>
+</html>
